@@ -32,6 +32,7 @@ public class SoundEffects {
             case PROMOTE -> file = new File(PROMOTE_SOUND);
             case GAME_START -> file = new File(GAME_START_SOUND);
             case GAME_END -> file = new File(GAME_END_SOUND);
+            case CLICK -> file = new File(CLICK_SOUND);
         }
 
         return file;

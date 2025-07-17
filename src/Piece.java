@@ -4,14 +4,17 @@ import Enums.Type;
 
 import java.util.ArrayList;
 import java.util.List;
-import static Enums.EnPassant.*;
+
+import static Enums.EnPassant.NO;
 
 public class Piece {
     public Type pieceType;
     public Color pieceColor;
     public String imagePath;
     public List<int[]> validMoves;
-    public EnPassant doneEnPassant;
+
+    public EnPassant leftEnPassant;
+    public EnPassant rightEnPassant;
 
     public int row;
     public int col;
@@ -20,9 +23,13 @@ public class Piece {
     public int[][] directions;
     public boolean doneCastled;
 
-    public Piece(Type pieceType, Color pieceColor, int row, int col, int value, String imagePath) {
+    public Piece(Type pieceType, Color pieceColor) {
         this.pieceType = pieceType;
         this.pieceColor = pieceColor;
+    }
+
+    public Piece(Type pieceType, Color pieceColor, int row, int col, int value, String imagePath) {
+        this(pieceType, pieceColor);
         this.row = row;
         this.col = col;
         this.value = value;
@@ -31,36 +38,34 @@ public class Piece {
         validMoves = new ArrayList<>();
         directions = calculateDirections();
         doneCastled = false;
-        doneEnPassant = NO;
+
+        leftEnPassant = NO;
+        rightEnPassant = NO;
     }
 
     public int[][] calculateDirections() {
         switch (pieceType) {
             case PAWN -> {
                 switch (pieceColor) {
-                    case WHITE -> {
-                        return new int[][] { {-1, 0}, {-2, 0}, {-1, 1}, {-1, -1} };
-                    }
-                    case BLACK -> {
-                        return new int[][] { {1, 0}, {2, 0}, {1, 1}, {1, -1} };
-                    }
+                    case WHITE -> { return new int[][] { {-1, 0}, {-2, 0}, {-1, 1}, {-1, -1} }; }
+                    case BLACK -> { return new int[][] { {1, 0}, {2, 0}, {1, 1}, {1, -1}}; }
                 }
             }
 
             case KNIGHT -> {
-                return new int[][] { {2, 1}, {2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {-2, 1}, {-2, -1} };
+                return new int[][]{{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {-2, 1}, {-2, -1}};
             }
 
             case BISHOP -> {
-                return new int[][] { {1, 1}, {-1, 1}, {-1, -1}, {1, -1} };
+                return new int[][]{{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
             }
 
             case ROOK -> {
-                return new int[][] { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
+                return new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
             }
 
             case QUEEN, KING -> {
-                return new int[][] { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
+                return new int[][]{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
             }
 
         }
@@ -75,7 +80,7 @@ public class Piece {
     }
 
     public void addValidMove(int row, int col) {
-        validMoves.add(new int[] {row, col});
+        validMoves.add(new int[]{row, col});
     }
 
     public void clearValidMoves() {

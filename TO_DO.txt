@@ -1,8 +1,19 @@
-Functionalities that need to be implemented
-- In the case when a check is given, stop the user from making a move
-that leaves the king vulnerable to attack again
-- Test the application by playing some games
-- Review the code and make final adjustments
+Features to be implemented
+
+--> Aesthetics
+- Add more piece themes
+- Give the user the options to choose the pieces they want to play (white or black)
+
+--> Functionality
 - Implement the minimax algorithm
 - Optimize minimax with alpha-beta pruning
-- Add more piece themes
+- Optimize the move calculation function
+- Debug and resolve en passant issue [Done]
+- Test and make sure en passant works correctly [Done]
+- In the case when a check is given, stop the user from making a move
+that leaves the king vulnerable to attack again
+
+--> Remarks
+Currently the way the app is structures seems a bit messy and not very easily modifiable.
+It should be refactored in a way such that it is easier to integrate new feature into the
+application, such as new game modes, new moves and so on.

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import static Enums.SoundType.CLICK;
 import static Enums.SoundType.PROMOTE;
 import static Enums.Type.*;
 
@@ -96,6 +97,7 @@ public class PromotionWindow extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        Color myColor = new Color(174, 186, 252);
         Object source = e.getSource();
 
         if (source.equals(chooseButton)) {
@@ -108,32 +110,35 @@ public class PromotionWindow extends JFrame implements ActionListener {
                 Main.frame.setEnabled(true);
                 this.dispose();
                 SoundEffects.playSound(PROMOTE);
+                return;
             } else
                 JOptionPane.showMessageDialog(this, "Choose an option!", "Error", JOptionPane.ERROR_MESSAGE);
         } if (source.equals(queenButton)) {
-            queenButton.setBackground(Color.RED);
+            queenButton.setBackground(myColor);
             rookButton.setBackground(null);
             bishopButton.setBackground(null);
             knightButton.setBackground(null);
             pieceType = QUEEN;
         } else if (source.equals(rookButton)) {
             queenButton.setBackground(null);
-            rookButton.setBackground(Color.RED);
+            rookButton.setBackground(myColor);
             bishopButton.setBackground(null);
             knightButton.setBackground(null);
             pieceType = ROOK;
         } else if (source.equals(bishopButton)) {
             queenButton.setBackground(null);
             rookButton.setBackground(null);
-            bishopButton.setBackground(Color.RED);
+            bishopButton.setBackground(myColor);
             knightButton.setBackground(null);
             pieceType = BISHOP;
         } else if (source.equals(knightButton)) {
             queenButton.setBackground(null);
             rookButton.setBackground(null);
             bishopButton.setBackground(null);
-            knightButton.setBackground(Color.RED);
+            knightButton.setBackground(myColor);
             pieceType = KNIGHT;
         }
+
+        SoundEffects.playSound(CLICK);
     }
 }

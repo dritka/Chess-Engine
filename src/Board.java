@@ -5,7 +5,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,12 +27,14 @@ public class Board extends JPanel {
     public static Piece pieceToMove;
     public static Square startingSquare;
 
-
     public static Map<Map<Type, Enums.Color>, String> imagePaths;
 
     public static List<Color[]> themes;
     public static Color[] theme;
     public static int themeIndex;
+
+    // -1 means left, 0 means the move is not en passant, 1 means right
+    public static int enPassantType;
 
     public Board() {
         PreProcess.loadThemes();
@@ -63,7 +64,6 @@ public class Board extends JPanel {
         });
 
         setup();
-        SoundEffects.playSound(GAME_START);
     }
 
     private void setup() {
@@ -75,83 +75,45 @@ public class Board extends JPanel {
             }
         }
 
+        setupPawns(WHITE, 6);
+        setupBackRank(WHITE, 7);
 
-        // CODE TO SET UP THE WHITE PIECES
-        Piece piece;
-        HashMap<Type, Enums.Color> map = new HashMap<>();
-        map.put(PAWN, WHITE);
-
-        for (int col = 0; col < COLS; col++) {
-            piece = new Piece(PAWN, WHITE, 6, col, 1, imagePaths.get(map));
-            addPiece(piece);
-        }
-
-        map.clear();
-        map.put(ROOK, WHITE);
-        piece = new Piece(ROOK, WHITE, 7, 0, 5, imagePaths.get(map));
-        addPiece(piece);
-        piece = new Piece(ROOK, WHITE, 7, 7, 5, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(KNIGHT, WHITE);
-        piece = new Piece(KNIGHT, WHITE, 7, 1, 3, imagePaths.get(map));
-        addPiece(piece);
-        piece = new Piece(KNIGHT, WHITE, 7, 6, 3, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(BISHOP, WHITE);
-        piece = new Piece(BISHOP, WHITE, 7, 2, 3, imagePaths.get(map));
-        addPiece(piece);
-        piece = new Piece(BISHOP, WHITE, 7, 5, 3, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(QUEEN, WHITE);
-        piece = new Piece(QUEEN, WHITE, 7, 3, 9, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(KING, WHITE);
-        piece = new Piece(KING, WHITE, 7, 4, Integer.MAX_VALUE, imagePaths.get(map));
-        addPiece(piece);
-
-        map.clear();
-        map.put(PAWN, BLACK);
-        // CODE TO SET UP THE BLACK PIECES
-        for (int col = 0; col < COLS; col++) {
-            piece = new Piece(PAWN, BLACK, 1, col, 1, imagePaths.get(map));
-            addPiece(piece);
-        }
-
-        map.clear();
-        map.put(ROOK, BLACK);
-        piece = new Piece(ROOK, BLACK, 0, 0, 5, imagePaths.get(map));
-        addPiece(piece);
-        piece = new Piece(ROOK, BLACK, 0, 7, 5, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(KNIGHT, BLACK);
-        piece = new Piece(KNIGHT, BLACK, 0, 1, 3, imagePaths.get(map));
-        addPiece(piece);
-        piece = new Piece(KNIGHT, BLACK, 0, 6, 3, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(BISHOP, BLACK);
-        piece = new Piece(BISHOP, BLACK, 0, 2, 3, imagePaths.get(map));
-        addPiece(piece);
-        piece = new Piece(BISHOP, BLACK, 0, 5, 3, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(QUEEN, BLACK);
-        piece = new Piece(QUEEN, BLACK, 0, 3, 9, imagePaths.get(map));
-        addPiece(piece);
-        map.clear();
-        map.put(KING, BLACK);
-        piece = new Piece(KING, BLACK, 0, 4, Integer.MAX_VALUE, imagePaths.get(map));
-        addPiece(piece);
+        setupPawns(BLACK, 1);
+        setupBackRank(BLACK, 0);
 
         calculateMoves();
     }
 
-    // Helper methods for the setup method, thus it's private
+    private void setupPawns(Enums.Color color, int row) {
+        for (int col = 0; col < COLS; col++) {
+            Piece piece = new Piece(PAWN, color, row, col, color.equals(WHITE) ? 1 : -1, imagePaths.get(Map.of(PAWN, color)));
+            addPiece(piece);
+        }
+    }
+
+    private void setupBackRank(Enums.Color color, int row) {
+        int value = 3;
+        int kingValue = Integer.MAX_VALUE;
+
+        Object[][] layout = {
+                {ROOK,   0, 5},
+                {KNIGHT, 1, 3},
+                {BISHOP, 2, 3},
+                {QUEEN,  3, 9},
+                {KING,   4, kingValue},
+                {BISHOP, 5, 3},
+                {KNIGHT, 6, 3},
+                {ROOK,   7, 5},
+        };
+
+        for (Object[] entry : layout) {
+            Type type = (Type) entry[0];
+            int col = (int) entry[1];
+            int pieceValue = (int) entry[2];
+            addPiece(new Piece(type, color, row, col, color.equals(WHITE) ? pieceValue : (-1 * pieceValue), imagePaths.get(Map.of(type, color))));
+        }
+    }
+
     private static Square squareSetup(int row, int col) {
         Square square;
 
@@ -166,6 +128,7 @@ public class Board extends JPanel {
             else
                 square = new Square(theme[1], row, col);
         }
+
         return square;
     }
 
@@ -177,29 +140,25 @@ public class Board extends JPanel {
         Square square = board[piece.row][piece.col];
         square.addPiece(piece);
 
-        if (piece.pieceColor.equals(BLACK)) {
+        if (piece.pieceColor.equals(BLACK))
             blackPieces.add(piece);
-        } else {
+        else
             whitePieces.add(piece);
-        }
+    }
+
+    private static Piece getPiece(Type type, Enums.Color color) {
+        List<Piece> pieces = color.equals(WHITE) ? whitePieces : blackPieces;
+        for (Piece piece : whitePieces)
+            if (piece.pieceType.equals(type) && piece.pieceColor.equals(color)) return piece;
+        return null;
     }
 
     public static void calculateMoves() {
-        for (Piece piece : whitePieces) {
-            try {
-                calculate(piece, WHITE);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
+        for (Piece piece : whitePieces)
+            calculate(piece, WHITE);
 
-        for (Piece piece : blackPieces) {
-            try {
-                calculate(piece, BLACK);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
+        for (Piece piece : blackPieces)
+            calculate(piece, BLACK);
     }
 
     public static void calculate(Piece piece, Enums.Color color) {
@@ -223,7 +182,9 @@ public class Board extends JPanel {
 
                 exploreDiagonalMoves(piece, color, directions[2]);
                 exploreDiagonalMoves(piece, color, directions[3]);
-                checkForEnPassant(piece, color);
+
+                if (piece.leftEnPassant.equals(NO)) checkForEnPassant(piece, color, true);
+                if (piece.rightEnPassant.equals(NO)) checkForEnPassant(piece, color, false);
             }
 
             case KING, KNIGHT -> {
@@ -274,8 +235,8 @@ public class Board extends JPanel {
     private static boolean isValidSquare(int row, int col, Enums.Color color) {
         Square square = getSquare(row, col);
         return square.isEmpty() ||
-               (!square.isEmpty() &&
-               !square.piece.pieceColor.equals(color));
+                (!square.isEmpty() &&
+                        !square.piece.pieceColor.equals(color));
     }
 
     private static boolean isValidMove(int row, int col, Enums.Color color) {
@@ -283,7 +244,7 @@ public class Board extends JPanel {
     }
 
     public static void movePiece(Square to) {
-        boolean isCastling = isCastling(to);
+        Square from = startingSquare;
         boolean isEmpty = to.isEmpty();
 
         startingSquare.addPiece(null);
@@ -291,26 +252,41 @@ public class Board extends JPanel {
         Piece piece = to.piece;
         to.addPiece(pieceToMove);
         removePiece(piece);
+        checkCasesAfterMove(to, isEmpty);
+    }
+
+    private static void checkCasesAfterMove(Square to, boolean isEmpty) {
+        boolean isCastling = isCastling(to);
 
         // TO DO: Clean Up
-        if (isEnPassant(to)) {
-            pieceToMove.doneEnPassant = NOT_ALLOWED;
+        int code;
+        if (Math.abs(code = isEnPassant(to)) == 1) {
             Square square = null;
             switch (pieceToMove.pieceColor) {
                 case WHITE -> square = getSquare(to.row + 1, to.col);
                 case BLACK -> square = getSquare(to.row - 1, to.col);
             }
 
+            if (code == 1)
+                Board.pieceToMove.rightEnPassant = NOT_ALLOWED;
+            else
+                Board.pieceToMove.leftEnPassant = NOT_ALLOWED;
+
             if (square != null) square.addPiece(null);
             SoundEffects.playSound(CAPTURE);
-        } else if (canPromote(pieceToMove)) {
+        }
+
+        if (canPromote(pieceToMove)) {
             Main.frame.setEnabled(false);
             new PromotionWindow(playerTurn, to);
-        } else if (isCastling) {
+        }
+
+        if (isCastling) {
             pieceToMove.doneCastled = true;
             castle(getCastlingType(to) ? KING_SIDE : QUEEN_SIDE);
-            return;
-        } else if (isCheck(to)) {
+        }
+
+        if (isCheck(to)) {
             SoundEffects.playSound(MOVE_CHECK);
         } else {
             if (isEmpty)
@@ -318,14 +294,11 @@ public class Board extends JPanel {
             else
                 SoundEffects.playSound(CAPTURE);
         }
-
-        update();
     }
 
-    private static void update() {
+    public static void update() {
         playerTurn = playerTurn.equals(WHITE) ? BLACK : WHITE;
         refresh();
-        calculateMoves();
     }
 
     private static void removePiece(Piece piece) {
@@ -341,16 +314,17 @@ public class Board extends JPanel {
         for (int[] move : from.piece.validMoves) {
             Square to = getSquare(move[0], move[1]);
             if (!to.isEmpty() &&
-                 to.piece.pieceType.equals(KING) &&
-                !to.isTeamPiece(from.piece)) return true;
+                    to.piece.pieceType.equals(KING) &&
+                    !to.isTeamPiece(from.piece)) return true;
         }
 
         return false;
     }
 
-    private static boolean isEnPassant(Square to) {
-        return pieceToMove.doneEnPassant.equals(YES) &&
-               pieceToMove.pieceType.equals(PAWN);
+    private static int isEnPassant(Square to) {
+        if (pieceToMove.leftEnPassant.equals(YES) && pieceToMove.pieceType.equals(PAWN)) return -1;
+        else if (pieceToMove.rightEnPassant.equals(YES) && pieceToMove.pieceType.equals(PAWN)) return 1;
+        return 0;
     }
 
     private static boolean canPromote(Piece piece) {
@@ -358,10 +332,6 @@ public class Board extends JPanel {
         return ((piece.pieceColor.equals(WHITE) && piece.row == 0) || (piece.pieceColor.equals(BLACK) && piece.row == 7));
     }
 
-    /*
-    true -> king side castling
-    false -> queen side castling
-     */
     private static boolean getCastlingType(Square to) {
         return (to.row == 0 && to.col == 6) || (to.row == 7 && to.col == 6);
     }
@@ -399,10 +369,10 @@ public class Board extends JPanel {
     public static boolean isCastling(Square to) {
         Piece piece = pieceToMove;
         return piece.pieceType.equals(KING) &&
-               ((to.row == 0 && to.col == 6) ||
-               (to.row == 0 && to.col == 2) ||
-               (to.row == 7 && to.col == 6) ||
-               to.row == 7 && to.col == 2);
+                ((to.row == 0 && to.col == 6) ||
+                        (to.row == 0 && to.col == 2) ||
+                        (to.row == 7 && to.col == 6) ||
+                        to.row == 7 && to.col == 2);
     }
 
     private static boolean checkQueenSideCastlingConditions(Square kingSquare,
@@ -411,10 +381,10 @@ public class Board extends JPanel {
                                                             Square inBetweenSecond,
                                                             Square inBetweenThird) {
         return kingSquare.piece.moves == 0 &&
-               rookSquare.piece.moves == 0 &&
-               inBetweenFirst.isEmpty() &&
-               inBetweenSecond.isEmpty() &&
-               inBetweenThird.isEmpty();
+                rookSquare.piece.moves == 0 &&
+                inBetweenFirst.isEmpty() &&
+                inBetweenSecond.isEmpty() &&
+                inBetweenThird.isEmpty();
     }
 
     private static boolean checkKingSideCastlingConditions(Square kingSquare,
@@ -422,9 +392,9 @@ public class Board extends JPanel {
                                                            Square inBetweenFirst,
                                                            Square inBetweenSecond) {
         return kingSquare.piece.moves == 0 &&
-               rookSquare.piece.moves == 0 &&
-               inBetweenFirst.isEmpty() &&
-               inBetweenSecond.isEmpty();
+                rookSquare.piece.moves == 0 &&
+                inBetweenFirst.isEmpty() &&
+                inBetweenSecond.isEmpty();
     }
 
     // TO DO (?): Clean Up
@@ -464,8 +434,8 @@ public class Board extends JPanel {
             kingSquare = getSquare(7, 4);
 
             if (firstRookSquare.isEmpty() ||
-                secondRookSquare.isEmpty() ||
-                kingSquare.isEmpty()) return;
+                    secondRookSquare.isEmpty() ||
+                    kingSquare.isEmpty()) return;
 
             // Get the squares in between
             Square inBetweenFirst = getSquare(7, 1);
@@ -486,20 +456,25 @@ public class Board extends JPanel {
         }
     }
 
-    private static void checkForEnPassant(Piece piece, Enums.Color pieceColor) {
-        Square right = null, left = null;
-
-        int row = piece.row, rCol = piece.col + 1, lCol = piece.col - 1;
-        if (isInBounds(row, rCol)) right = getSquare(row, rCol);
-        if (isInBounds(row, lCol)) left = getSquare(row, lCol);
-
-        check(piece, pieceColor, right);
-        check(piece, pieceColor, left);
+    private static void checkForEnPassant(Piece piece, Enums.Color pieceColor, boolean left) {
+        int col = pieceColor.equals(WHITE) ?
+                (left ? piece.col - 1 : piece.col + 1) :
+                (left ? piece.col + 1 : piece.col - 1);
+        if (isInBounds(piece.row, col)) {
+            Square square = getSquare(piece.row, col);
+            check(piece, pieceColor, square, left);
+        }
     }
 
-    private static void check(Piece piece, Enums.Color pieceColor, Square square) {
-        if (square != null && !square.isEmpty() && !square.isTeamPiece(piece) && square.piece.moves == 1) {
-            piece.doneEnPassant = YES;
+    private static void check(Piece piece, Enums.Color pieceColor, Square square, boolean left) {
+        if (square != null && !square.isEmpty() && !square.isTeamPiece(piece) &&
+                square.piece.pieceType.equals(PAWN) && square.piece.moves == 1) {
+
+            if (left)
+                piece.leftEnPassant = YES;
+            else
+                piece.rightEnPassant = YES;
+
             if (pieceColor.equals(WHITE))
                 piece.addValidMove(square.row - 1, square.col);
             else

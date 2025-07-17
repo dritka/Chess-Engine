@@ -81,6 +81,8 @@ public class Square extends JButton implements ActionListener {
             }
         } else if (checkMoveOrCaptureConditions()) {
             Board.movePiece(this);
+            Board.calculateMoves();
+            Board.update();
         } else {
             Board.startingSquare = null;
             Board.pieceToMove = null;
