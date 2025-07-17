@@ -3,25 +3,29 @@ import Enums.EnPassant;
 import Enums.Type;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static Enums.EnPassant.NO;
 
 public class Piece {
     public Type pieceType;
-    public Color pieceColor;
     public String imagePath;
+    public Color pieceColor;
     public List<int[]> validMoves;
-
     public EnPassant leftEnPassant;
     public EnPassant rightEnPassant;
 
     public int row;
     public int col;
     public int value;
-    public int moves;
+    public int numOfMoves;
     public int[][] directions;
     public boolean doneCastled;
+
+    private static final int[][] DIAGONAL_DIRECTIONS = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+    private static final int[][] STRAIGHT_DIRECTIONS = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    private static final int[][] ALL_DIRECTIONS = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
 
     public Piece(Type pieceType, Color pieceColor) {
         this.pieceType = pieceType;
@@ -33,7 +37,7 @@ public class Piece {
         this.row = row;
         this.col = col;
         this.value = value;
-        this.moves = 0;
+        this.numOfMoves = 0;
         this.imagePath = imagePath;
         validMoves = new ArrayList<>();
         directions = calculateDirections();
@@ -45,10 +49,15 @@ public class Piece {
 
     public int[][] calculateDirections() {
         switch (pieceType) {
+            // Refactor
             case PAWN -> {
                 switch (pieceColor) {
-                    case WHITE -> { return new int[][] { {-1, 0}, {-2, 0}, {-1, 1}, {-1, -1} }; }
-                    case BLACK -> { return new int[][] { {1, 0}, {2, 0}, {1, 1}, {1, -1}}; }
+                    case WHITE -> {
+                        return new int[][]{{-1, 0}, {-2, 0}, {-1, 1}, {-1, -1}};
+                    }
+                    case BLACK -> {
+                        return new int[][]{{1, 0}, {2, 0}, {1, 1}, {1, -1}};
+                    }
                 }
             }
 
@@ -57,20 +66,20 @@ public class Piece {
             }
 
             case BISHOP -> {
-                return new int[][]{{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+                return DIAGONAL_DIRECTIONS;
             }
 
             case ROOK -> {
-                return new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+                return STRAIGHT_DIRECTIONS;
             }
 
             case QUEEN, KING -> {
-                return new int[][]{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
+                return ALL_DIRECTIONS;
             }
 
         }
 
-        return null;
+        return new int[0][];
     }
 
     public boolean canReach(int row, int col) {
@@ -90,6 +99,18 @@ public class Piece {
     public void update(Square square) {
         this.row = square.row;
         this.col = square.col;
-        this.moves += 1;
+        this.numOfMoves += 1;
+    }
+
+    /*
+    public List<int[]> getValidMoves() {
+        return Collections.unmodifiableList(validMoves);
+    }
+     */
+
+    // For tracking moves
+    @Override
+    public String toString() {
+        return this.pieceColor.toString() + " moved " + this.pieceType.toString() + "to row: " + this.row + ", col: " + this.col;
     }
 }

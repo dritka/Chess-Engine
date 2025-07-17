@@ -197,8 +197,8 @@ public class Board extends JPanel {
                                                             Square inBetweenFirst,
                                                             Square inBetweenSecond,
                                                             Square inBetweenThird) {
-        return kingSquare.piece.moves == 0 &&
-                rookSquare.piece.moves == 0 &&
+        return kingSquare.piece.numOfMoves == 0 &&
+                rookSquare.piece.numOfMoves == 0 &&
                 inBetweenFirst.isEmpty() &&
                 inBetweenSecond.isEmpty() &&
                 inBetweenThird.isEmpty();
@@ -208,8 +208,8 @@ public class Board extends JPanel {
                                                            Square rookSquare,
                                                            Square inBetweenFirst,
                                                            Square inBetweenSecond) {
-        return kingSquare.piece.moves == 0 &&
-                rookSquare.piece.moves == 0 &&
+        return kingSquare.piece.numOfMoves == 0 &&
+                rookSquare.piece.numOfMoves == 0 &&
                 inBetweenFirst.isEmpty() &&
                 inBetweenSecond.isEmpty();
     }
@@ -226,7 +226,7 @@ public class Board extends JPanel {
 
     private static void check(Piece piece, Enums.Color pieceColor, Square square, boolean left) {
         if (square != null && !square.isEmpty() && !square.isTeamPiece(piece) &&
-                square.piece.pieceType.equals(PAWN) && square.piece.moves == 1) {
+                square.piece.pieceType.equals(PAWN) && square.piece.numOfMoves == 1) {
 
             if (left)
                 piece.leftEnPassant = YES;
@@ -266,7 +266,7 @@ public class Board extends JPanel {
                     direction = directions[1];
                     newRow = piece.row + direction[0];
                     newCol = piece.col + direction[1];
-                    if (piece.moves == 0 && isInBounds(newRow, newCol) && getSquare(newRow, newCol).isEmpty())
+                    if (piece.numOfMoves == 0 && isInBounds(newRow, newCol) && getSquare(newRow, newCol).isEmpty())
                         piece.addValidMove(newRow, newCol);
                 }
 
