@@ -1,10 +1,7 @@
 import Enums.Type;
-
 import java.awt.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-
+import java.nio.file.*;
 import static Constants.CONST.*;
 
 public class PreProcess {
@@ -39,28 +36,6 @@ public class PreProcess {
             System.out.println(e.getMessage());
         }
     }
-
-    /*
-    public static void loadPieceData() {
-        Board.pieceData = new HashMap<>();
-
-        try {
-            Path path = Paths.get(PIECE_DATA);
-            Scanner scanner = new Scanner(path);
-            scanner.useDelimiter(";");
-
-            while (scanner.hasNextLine()) {
-                Type pieceType = Type.valueOf(scanner.next());
-                int row = Integer.parseInt(scanner.next());
-                int col = Integer.parseInt(scanner.next());
-                int val = Integer.parseInt(scanner.next());
-                Board.pieceData.put(pieceType, new int[] {row, col, val});
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-     */
 
     public static void loadImages() {
         Board.imagePaths = new HashMap<>();

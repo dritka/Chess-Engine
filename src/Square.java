@@ -73,7 +73,7 @@ public class Square extends JButton implements ActionListener {
             Board.refresh();
 
             for (int[] valid : piece.validMoves) {
-                Square square = Board.getSquare(valid[0], valid[1]);
+                Square square = Board.board[valid[0]][valid[1]];
                 if (!square.isEmpty() && !square.isTeamPiece(piece))
                     square.setBackground(TEMP);
                 else
