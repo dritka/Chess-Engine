@@ -17,6 +17,8 @@ import static Enums.EnPassant.*;
 import static Enums.SoundType.*;
 import static Enums.Type.*;
 
+// This is just for testing purposes
+
 public class Board extends JPanel {
     public static Enums.Color playerTurn;
     public static Square[][] board;
