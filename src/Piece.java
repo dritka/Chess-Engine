@@ -1,10 +1,6 @@
-import Enums.Color;
-import Enums.EnPassant;
-import Enums.Type;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import Enums.*;
 import java.util.List;
+import java.util.ArrayList;
 
 import static Enums.EnPassant.NO;
 
@@ -111,6 +107,6 @@ public class Piece {
     // For tracking moves
     @Override
     public String toString() {
-        return this.pieceColor.toString() + " moved " + this.pieceType.toString() + "to row: " + this.row + ", col: " + this.col;
+        return this.pieceColor.toString() + " moved " + this.pieceType.toString() + " to row: " + this.row + ", col: " + this.col;
     }
 }

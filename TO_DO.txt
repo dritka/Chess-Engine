@@ -8,10 +8,13 @@ Features to be implemented
 - Implement the minimax algorithm
 - Optimize minimax with alpha-beta pruning
 - Optimize the move calculation function
-- Debug and resolve en passant issue [Done]
-- Test and make sure en passant works correctly [Done]
+- Debug and resolve en passant issue
+- Test and make sure en passant works correctly
 - In the case when a check is given, stop the user from making a move
 that leaves the king vulnerable to attack again
+- Cache the valid moves of a piece, this way when a piece returns
+to a square that it has previously visited we won't have to recalculate
+its valid moves
 
 --> Remarks
 Currently the way the app is structures seems a bit messy and not very easily modifiable.

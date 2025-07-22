@@ -22,7 +22,9 @@ public class CONST {
     public static final String CLICK_SOUND = "sounds/click.wav";
 
     // Config file paths
-    public static final String BOARD_THEMES = "config\\board_themes.txt";
-    public static final String DEFAULT = "config\\piece_themes\\default.txt";
-    public static final String PIECE_DATA = "config\\piece_data.txt";
+    public static final String BOARD_THEMES = "config/board_themes.txt";
+    public static final String DEFAULT = "config/piece_themes/default.txt";
+    public static final String PIECE_DATA = "config/piece_data.txt";
+
+    public static final String DOT = "images/dot.png";
 }
