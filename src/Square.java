@@ -6,8 +6,12 @@ import java.util.List;
 import java.awt.event.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static Enums.Color.BLACK;
+import static Enums.Color.WHITE;
 import static Enums.SoundType.*;
 import static Constants.CONST.*;
+import static Enums.Type.KING;
 
 public class Square extends JButton implements ActionListener {
     /*
@@ -151,6 +155,14 @@ public class Square extends JButton implements ActionListener {
                 if (dependent.equals(Board.pieceToMove)) continue;
                 Board.calculate(dependent);
             }
+
+            Piece king = Board.pieceMap.get(WHITE).get(KING).get(0);
+            Board.calculate(king);
+            if (!king.doneCastled) Board.checkForCastle(king);
+
+            king = Board.pieceMap.get(BLACK).get(KING).get(0);
+            Board.calculate(king);
+            if (!king.doneCastled) Board.checkForCastle(king);
 
             System.out.printf("The calculateMoves() function was called a total of %d times this turn!%n", Board.count); // again for logging purposes
             Board.update();

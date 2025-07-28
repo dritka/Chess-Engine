@@ -15,6 +15,9 @@ that leaves the king vulnerable to attack again
 - Cache the valid moves of a piece, this way when a piece returns
 to a square that it has previously visited we won't have to recalculate
 its valid moves
+- In the case of the kings, we need to check if there are any opponent pieces
+that stop the king from moving to any of its valid squares, in this case we
+need to also update the kings pieces if this certain opponent piece is moved.
 
 --> Remarks
 Currently the way the app is structures seems a bit messy and not very easily modifiable.

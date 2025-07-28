@@ -32,7 +32,7 @@ public class Board extends JPanel {
     public static int count = 0;
     public static Map<Enums.Color, Map<Type, List<Piece>>> pieceMap;
 
-    public static int enPassantType; // -1 means left, 0 means the move is not en passant, 1 means right
+    // public static int enPassantType; // -1 means left, 0 means the move is not en passant, 1 means right
 
     public Board() {
         PreProcess.loadThemes();
@@ -198,7 +198,7 @@ public class Board extends JPanel {
         return (to.row == 0 && to.col == 6) || (to.row == 7 && to.col == 6);
     }
 
-    public static boolean isCastling(Square to) {
+    private static boolean isCastling(Square to) {
         Piece piece = pieceToMove;
         return piece.pieceType.equals(KING) &&
                 ((to.row == 0 && to.col == 6) ||
@@ -250,8 +250,13 @@ public class Board extends JPanel {
             calculate(piece);
         }
 
-        calculate(pieceMap.get(WHITE).get(KING).get(0));
-        calculate(pieceMap.get(BLACK).get(KING).get(0));
+        Piece king = pieceMap.get(WHITE).get(KING).get(0);
+        calculate(king);
+        if (!king.doneCastled) checkForCastle(king);
+
+        king = pieceMap.get(BLACK).get(KING).get(0);
+        calculate(king);
+        if (!king.doneCastled) checkForCastle(king);
         System.out.println("-------------------------------------------------------------------------");
     }
 
@@ -287,8 +292,6 @@ public class Board extends JPanel {
             }
 
             case KING, KNIGHT -> {
-                if (piece.pieceType.equals(KING) && !piece.doneCastled) checkForCastle(piece);
-
                 for (int[] dir : directions) {
                     int newRow = piece.row + dir[0];
                     int newCol = piece.col + dir[1];
@@ -495,37 +498,6 @@ public class Board extends JPanel {
         pieceToMove = rookPiece;
         movePiece(to);
         SoundEffects.playSound(CASTLE);
-
-        /*
-        Square rookSquare = null;
-        Square to = null;
-        switch (type) {
-            case KING_SIDE -> {
-                if (playerTurn.equals(WHITE)) {
-                    rookSquare = getSquare(7, 7);
-                    to = getSquare(7, 5);
-                } else {
-                    rookSquare = getSquare(0, 7);
-                    to = getSquare(0, 5);
-                }
-            }
-
-            case QUEEN_SIDE -> {
-                if (playerTurn.equals(WHITE)) {
-                    rookSquare = getSquare(7, 0);
-                    to = getSquare(7, 3);
-                } else {
-                    rookSquare = getSquare(0, 0);
-                    to = getSquare(0, 3);
-                }
-            }
-        }
-
-        startingSquare = rookSquare;
-        pieceToMove = rookSquare.piece;
-        movePiece(to);
-        SoundEffects.playSound(CASTLE);
-         */
     }
 
     private static boolean check(int from, int to, int row) {
@@ -540,7 +512,8 @@ public class Board extends JPanel {
     }
 
     // TO DO (?): Clean Up
-    private static void checkForCastle(Piece piece) {
+    public static void checkForCastle(Piece piece) {
+        if (piece.numOfMoves != 0) return;
         Enums.Color color = piece.pieceColor;
 
         int row = color.equals(WHITE) ? 7 : 0;
@@ -550,9 +523,9 @@ public class Board extends JPanel {
         boolean canCastleQueenSide = check(leftRook.col, piece.col, row);
         boolean canCastleKingSide = check(piece.col, rightRook.col, row);
 
-        if (canCastleQueenSide)
+        if (canCastleQueenSide && leftRook.numOfMoves == 0)
             piece.addValidMove(row, piece.col - 2);
-        if (canCastleKingSide)
+        if (canCastleKingSide && rightRook.numOfMoves == 0)
             piece.addValidMove(row, piece.col + 2);
     }
 
