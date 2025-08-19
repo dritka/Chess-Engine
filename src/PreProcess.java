@@ -43,6 +43,7 @@ public class PreProcess {
         try {
             Path path = Paths.get(DEFAULT);
             Scanner scanner = new Scanner(path);
+            scanner.useDelimiter(System.lineSeparator());
             scanner.useDelimiter(",");
 
             while (scanner.hasNextLine()) {

@@ -8,5 +8,7 @@ public enum SoundType {
     PROMOTE,
     ILLEGAL,
     CASTLE,
-    GAME_END
+    GAME_END,
+    CLICK,
+    SCREAM
 }
