@@ -252,15 +252,20 @@ public class Board extends JPanel {
 
         Piece king = pieceMap.get(WHITE).get(KING).get(0);
         calculate(king);
-        if (!king.doneCastled) checkForCastle(king);
+        // if (!king.doneCastled) checkForCastle(king);
 
         king = pieceMap.get(BLACK).get(KING).get(0);
         calculate(king);
-        if (!king.doneCastled) checkForCastle(king);
+        // if (!king.doneCastled) checkForCastle(king);
         System.out.println("-------------------------------------------------------------------------");
     }
 
     public static void calculate(Piece piece) {
+        for (int[] move : piece.validMoves) {
+            Square square = getSquare(move[0], move[1]);
+            square.removeDependent(piece);
+        }
+
         piece.clearValidMoves();
         int[][] directions = piece.directions;
 
@@ -298,7 +303,15 @@ public class Board extends JPanel {
 
                     if (isInBounds(newRow, newCol)) {
                         Square square = getSquare(newRow, newCol);
-                        if (isValidSquare(square, piece.pieceColor)) piece.addValidMove(newRow, newCol);
+                        if (isValidSquare(square, piece.pieceColor)) {
+                            boolean valid = square.getDependentPieces().stream()
+                                    .noneMatch(p -> p.pieceColor.equals(
+                                            piece.pieceColor.equals(WHITE) ? BLACK : WHITE
+                                    ));
+
+                            if (piece.pieceType.equals(KING) && !valid) continue;
+                            piece.addValidMove(newRow, newCol);
+                        }
                         square.addDependent(piece);
                     }
                 }
@@ -396,9 +409,9 @@ public class Board extends JPanel {
      *
      * @param to - The square the selected piece is being moved.
      * @param isEmpty - Tells us if the square we are moving to
-     *                  contains a piece or not.
+     *                  contains a piece or not
      * @param isCastling - Tells us if the current move is a
-     *                     castling move.
+     *                   cas castling move
      */
     private static void checkCasesAfterMove(Square to, boolean isEmpty, boolean isCastling) {
         // TO DO: Clean Up
@@ -505,10 +518,20 @@ public class Board extends JPanel {
 
         for (int i = from + 1; i < to; i++) {
             Square square = getSquare(row, i);
-            if (square.isEmpty()) squares.add(square);
+            if (!square.isEmpty()) return false;
+            squares.add(square);
         }
 
-        return !squares.isEmpty();
+        /*
+        Detects if there are any opposing pieces that
+        attack any of the squares in between the king
+        and the rook. If so then castling is not allowed
+        */
+        return squares.stream()
+                .flatMap(s -> s.getDependentPieces().stream())
+                .noneMatch(piece -> piece.pieceColor.equals(
+                        (row == 7) ? BLACK : WHITE
+                ));
     }
 
     // TO DO (?): Clean Up

@@ -18,12 +18,11 @@ public class Square extends JButton implements ActionListener {
      TO DO: Implement getters and setters for all fields except dependentPieces (only getter)
      and also set the respective fields to private
      */
-    public Piece piece;
-    public Color color;
     public int row;
     public int col;
+    public Piece piece;
+    public Color color;
     private final Set<Piece> dependentPieces;
-    private final Map<Color, Map<Type, List<int[]>>> cache;
 
     public Square(Color color, int row, int col) {
         piece = null;
@@ -31,7 +30,7 @@ public class Square extends JButton implements ActionListener {
         this.row = row;
         this.col = col;
         dependentPieces = new HashSet<>();
-        cache = new HashMap<>();
+        // cache = new HashMap<>();
         this.setBackground(color);
         this.addActionListener(this);
     }

@@ -98,12 +98,6 @@ public class Piece {
         this.numOfMoves += 1;
     }
 
-    /*
-    public List<int[]> getValidMoves() {
-        return Collections.unmodifiableList(validMoves);
-    }
-     */
-
     // For tracking moves
     @Override
     public String toString() {
