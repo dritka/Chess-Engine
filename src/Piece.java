@@ -2,86 +2,54 @@ import Enums.*;
 import java.util.List;
 import java.util.ArrayList;
 
-import static Enums.EnPassant.NO;
+import static Enums.Color.*;
+import static Enums.Type.*;
 
 public class Piece {
-    public Type pieceType;
-    public String imagePath;
-    public Color pieceColor;
-    public List<int[]> validMoves;
-    public EnPassant leftEnPassant;
-    public EnPassant rightEnPassant;
-
     public int row;
     public int col;
     public int value;
     public int numOfMoves;
+    public Type pieceType;
+    public String imagePath;
+    public Color pieceColor;
+    public int[] lastPosition;
     public int[][] directions;
-    public boolean doneCastled;
-
-    private static final int[][] DIAGONAL_DIRECTIONS = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
-    private static final int[][] STRAIGHT_DIRECTIONS = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-    private static final int[][] ALL_DIRECTIONS = {{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}};
+    public List<int[]> validMoves;
 
     public Piece(Type pieceType, Color pieceColor) {
         this.pieceType = pieceType;
         this.pieceColor = pieceColor;
     }
 
-    public Piece(Type pieceType, Color pieceColor, int row, int col, int value, String imagePath) {
+    public Piece(Type pieceType, Color pieceColor, int col, int value, String imagePath) {
         this(pieceType, pieceColor);
-        this.row = row;
+        this.row = pieceType.equals(PAWN) ?
+                (pieceColor.equals(WHITE) ? 6 : 1) :
+                (pieceColor.equals(WHITE) ? 7 : 0);
         this.col = col;
         this.value = value;
-        this.numOfMoves = 0;
         this.imagePath = imagePath;
+        numOfMoves = 0;
         validMoves = new ArrayList<>();
-        directions = calculateDirections();
-        doneCastled = false;
-
-        leftEnPassant = NO;
-        rightEnPassant = NO;
     }
 
-    public int[][] calculateDirections() {
-        switch (pieceType) {
-            // Refactor
-            case PAWN -> {
-                switch (pieceColor) {
-                    case WHITE -> {
-                        return new int[][]{{-1, 0}, {-2, 0}, {-1, 1}, {-1, -1}};
-                    }
-                    case BLACK -> {
-                        return new int[][]{{1, 0}, {2, 0}, {1, 1}, {1, -1}};
-                    }
-                }
-            }
+    public boolean sameColor(Enums.Color pieceColor) {
+        return this.pieceColor.equals(pieceColor);
+    }
 
-            case KNIGHT -> {
-                return new int[][]{{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}, {-2, 1}, {-2, -1}};
-            }
-
-            case BISHOP -> {
-                return DIAGONAL_DIRECTIONS;
-            }
-
-            case ROOK -> {
-                return STRAIGHT_DIRECTIONS;
-            }
-
-            case QUEEN, KING -> {
-                return ALL_DIRECTIONS;
-            }
-
-        }
-
-        return new int[0][];
+    public boolean sameType(Type pieceType) {
+        return this.pieceType.equals(pieceType);
     }
 
     public boolean canReach(int row, int col) {
         for (int[] valid : validMoves)
             if (valid[0] == row && valid[1] == col) return true;
         return false;
+    }
+
+    public void setLastPosition() {
+        lastPosition = new int[] {row, col};
     }
 
     public void addValidMove(int row, int col) {
@@ -92,15 +60,15 @@ public class Piece {
         validMoves.clear();
     }
 
-    public void update(Square square) {
-        this.row = square.row;
-        this.col = square.col;
-        this.numOfMoves += 1;
+    public void update(Square square, boolean reverse) {
+        row = square.row;
+        col = square.col;
+        numOfMoves += reverse ? -1 : 1;
+        square.addPiece(this);
     }
 
-    // For tracking moves
-    @Override
-    public String toString() {
-        return this.pieceColor.toString() + " moved " + this.pieceType.toString() + " to row: " + this.row + ", col: " + this.col;
-    }
+    // Useful for pawn and king pieces
+    public EnPassant getLeftEnPassant() { return null; }
+    public EnPassant getRightEnPassant() { return null; }
+    public boolean getCastledStatus() { return false; }
 }

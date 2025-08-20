@@ -1,4 +1,5 @@
 import Enums.Type;
+
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
@@ -6,18 +7,12 @@ import java.util.List;
 import java.awt.event.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static Enums.Color.BLACK;
-import static Enums.Color.WHITE;
+import static Enums.Type.*;
+import static Enums.Color.*;
 import static Enums.SoundType.*;
 import static Constants.CONST.*;
-import static Enums.Type.KING;
 
 public class Square extends JButton implements ActionListener {
-    /*
-     TO DO: Implement getters and setters for all fields except dependentPieces (only getter)
-     and also set the respective fields to private
-     */
     public int row;
     public int col;
     public Piece piece;
@@ -30,7 +25,6 @@ public class Square extends JButton implements ActionListener {
         this.row = row;
         this.col = col;
         dependentPieces = new HashSet<>();
-        // cache = new HashMap<>();
         this.setBackground(color);
         this.addActionListener(this);
     }
@@ -78,6 +72,14 @@ public class Square extends JButton implements ActionListener {
 
     public void removeDependent(Piece piece) {
         this.dependentPieces.remove(piece);
+    }
+
+    public boolean sameColor(Enums.Color pieceColor) {
+        return this.piece.sameColor(pieceColor);
+    }
+
+    public boolean sameType(Type pieceType) {
+        return this.piece.sameType(pieceType);
     }
 
     public void addPiece(Piece piece) {
@@ -157,13 +159,10 @@ public class Square extends JButton implements ActionListener {
 
             Piece king = Board.pieceMap.get(WHITE).get(KING).get(0);
             Board.calculate(king);
-            if (!king.doneCastled) Board.checkForCastle(king);
 
             king = Board.pieceMap.get(BLACK).get(KING).get(0);
             Board.calculate(king);
-            if (!king.doneCastled) Board.checkForCastle(king);
 
-            System.out.printf("The calculateMoves() function was called a total of %d times this turn!%n", Board.count); // again for logging purposes
             Board.update();
         } else {
             Board.startingSquare = null;

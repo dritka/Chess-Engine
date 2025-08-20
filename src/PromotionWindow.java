@@ -1,15 +1,11 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Map;
-
-import static Enums.SoundType.CLICK;
-import static Enums.SoundType.PROMOTE;
+import javax.swing.*;
+import java.util.HashMap;
 import static Enums.Type.*;
+import static Enums.SoundType.*;
 
-public class PromotionWindow extends JFrame implements ActionListener {
+public class PromotionWindow extends JFrame {
     public JButton queenButton, knightButton, bishopButton, rookButton, chooseButton;
     public Enums.Type pieceType;
     public Enums.Color pieceColor;
@@ -34,11 +30,40 @@ public class PromotionWindow extends JFrame implements ActionListener {
         rookButton = new JButton(new ImageIcon(Board.imagePaths.get(map)));
         chooseButton = new JButton("Choose");
 
-        queenButton.addActionListener(this);
-        rookButton.addActionListener(this);
-        knightButton.addActionListener(this);
-        bishopButton.addActionListener(this);
-        chooseButton.addActionListener(this);
+        queenButton.addActionListener(e -> {
+            adjust();
+            pieceType = QUEEN;
+            SoundEffects.playSound(CLICK);
+        });
+        rookButton.addActionListener(e -> {
+            adjust();
+            pieceType = ROOK;
+            SoundEffects.playSound(CLICK);
+        });
+        knightButton.addActionListener(e -> {
+            adjust();
+            pieceType = KNIGHT;
+            SoundEffects.playSound(CLICK);
+        });
+        bishopButton.addActionListener(e -> {
+            adjust();
+            pieceType = BISHOP;
+            SoundEffects.playSound(CLICK);
+        });
+        chooseButton.addActionListener(e -> {
+            if (pieceType != null) {
+                Board.whitePieces.remove(to.piece);
+
+                Piece piece = getPieceFromType();
+                to.addPiece(piece);
+                Board.whitePieces.add(piece);
+                Main.frame.setEnabled(true);
+                this.dispose();
+                SoundEffects.playSound(PROMOTE);
+                return;
+            } else
+                JOptionPane.showMessageDialog(this, "Choose an option!", "Error", JOptionPane.ERROR_MESSAGE);
+        });
 
         JPanel optionsPanel = new JPanel(new GridLayout(1, 4, 10, 10));
         optionsPanel.add(queenButton, 0);
@@ -70,75 +95,39 @@ public class PromotionWindow extends JFrame implements ActionListener {
     }
 
     private Piece getPieceFromType() {
-        Piece piece = null;
-        Map<Enums.Type, Enums.Color> map = new HashMap<>();
-        
-        switch (pieceType) {
-            case QUEEN -> {
-                map.put(QUEEN, pieceColor);
-                piece = new Piece(QUEEN, pieceColor, to.row, to.col, 9, Board.imagePaths.get(map));
-            }
-            case ROOK -> {
-                map.put(ROOK, pieceColor);
-                piece = new Piece(ROOK, pieceColor, to.row, to.col, 5, Board.imagePaths.get(map));
-            }
-            case BISHOP -> {
-                map.put(BISHOP, pieceColor);
-                piece = new Piece(BISHOP, pieceColor, to.row, to.col, 3, Board.imagePaths.get(map));
-            }
-            case KNIGHT -> {
-                map.put(KNIGHT, pieceColor);
-                piece = new Piece(KNIGHT, pieceColor, to.row, to.col, 3, Board.imagePaths.get(map));
-            }
-        }
+        Piece piece = switch (pieceType) {
+            case QUEEN -> new Piece(QUEEN, pieceColor);
+            case ROOK -> new Piece(ROOK, pieceColor);
+            case BISHOP -> new Piece(BISHOP, pieceColor);
+            case PAWN -> null; // should never occur
+            case KNIGHT -> new Piece(KNIGHT, pieceColor);
+            case KING -> null; // should never occur
+        };
 
         return piece;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Color myColor = new Color(174, 186, 252);
-        Object source = e.getSource();
+    public void adjust() {
+        java.util.List<JButton> buttons = java.util.List.of(queenButton, rookButton, bishopButton, knightButton);
+        JButton exclude = switch (pieceType) {
+            case QUEEN -> queenButton;
+            case ROOK -> rookButton;
+            case BISHOP -> bishopButton;
+            case PAWN -> null; // should never occur
+            case KNIGHT -> knightButton;
+            case KING -> null; // should never occur
+        };
 
-        if (source.equals(chooseButton)) {
-            if (pieceType != null) {
-                Board.whitePieces.remove(to.piece);
-
-                Piece piece = getPieceFromType();
-                to.addPiece(piece);
-                Board.whitePieces.add(piece);
-                Main.frame.setEnabled(true);
-                this.dispose();
-                SoundEffects.playSound(PROMOTE);
-                return;
-            } else
-                JOptionPane.showMessageDialog(this, "Choose an option!", "Error", JOptionPane.ERROR_MESSAGE);
-        } if (source.equals(queenButton)) {
-            queenButton.setBackground(myColor);
-            rookButton.setBackground(null);
-            bishopButton.setBackground(null);
-            knightButton.setBackground(null);
-            pieceType = QUEEN;
-        } else if (source.equals(rookButton)) {
-            queenButton.setBackground(null);
-            rookButton.setBackground(myColor);
-            bishopButton.setBackground(null);
-            knightButton.setBackground(null);
-            pieceType = ROOK;
-        } else if (source.equals(bishopButton)) {
-            queenButton.setBackground(null);
-            rookButton.setBackground(null);
-            bishopButton.setBackground(myColor);
-            knightButton.setBackground(null);
-            pieceType = BISHOP;
-        } else if (source.equals(knightButton)) {
-            queenButton.setBackground(null);
-            rookButton.setBackground(null);
-            bishopButton.setBackground(null);
-            knightButton.setBackground(myColor);
-            pieceType = KNIGHT;
-        }
-
-        SoundEffects.playSound(CLICK);
+        /*
+        Another alternative is to do
+        Objects.requireNoNull(
+            exclude.setBackground(new Color(174, 186, 252))
+        );
+         */
+        if (exclude != null)
+            exclude.setBackground(new Color(174, 186, 252));
+        buttons.stream()
+                .filter(button -> !button.equals(exclude))
+                .forEach(button -> button.setBackground(null));
     }
 }
