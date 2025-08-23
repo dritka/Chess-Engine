@@ -10,7 +10,7 @@ public class Rook extends Piece {
     }
 
     public Rook(Color pieceColor, boolean left) {
-        super(PAWN,
+        super(ROOK,
                 pieceColor,
                 (left ? 0 : 7),
                 (pieceColor.equals(WHITE) ? 5 : -5),

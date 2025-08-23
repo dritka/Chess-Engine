@@ -177,8 +177,12 @@ public class Board extends JPanel {
     }
 
     private static int isEnPassant(Square to) {
-        if (((Pawn) pieceToMove).getLeftEnPassant().equals(YES) && pieceToMove.pieceType.equals(PAWN)) return -1;
-        if (((Pawn) pieceToMove).getRightEnPassant().equals(YES) && pieceToMove.pieceType.equals(PAWN)) return 1;
+        if (pieceToMove instanceof Pawn) {
+            if (((Pawn) pieceToMove).getLeftEnPassant().equals(YES) && pieceToMove.pieceType.equals(PAWN)) return -1;
+            if (((Pawn) pieceToMove).getRightEnPassant().equals(YES) && pieceToMove.pieceType.equals(PAWN)) return 1;
+            return 0;
+        }
+
         return 0;
     }
 
@@ -266,12 +270,15 @@ public class Board extends JPanel {
                 exploreDiagonalMoves(piece, directions[2]);
                 exploreDiagonalMoves(piece, directions[3]);
 
-                if (piece.getLeftEnPassant().equals(NO)) checkForEnPassant(piece, true);
-                if (piece.getRightEnPassant().equals(NO)) checkForEnPassant(piece, false);
+                if (piece instanceof Pawn) {
+                    if (((Pawn) piece).getLeftEnPassant().equals(NO)) checkForEnPassant(piece, true);
+                    if (((Pawn) piece).getRightEnPassant().equals(NO)) checkForEnPassant(piece, false);
+                }
             }
 
             case KING, KNIGHT -> {
-                if (piece.sameType(KING) && piece.getCastledStatus()) checkForCastle(piece);
+                if (piece instanceof King)
+                    if (piece.sameType(KING) && !((King) piece).getCastledStatus()) checkForCastle(piece);
 
                 for (int[] dir : directions) {
                     int newRow = piece.row + dir[0];

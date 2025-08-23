@@ -28,7 +28,6 @@ public class King extends Piece {
         };
     }
 
-    @Override
     public boolean getCastledStatus() {
         return castledStatus;
     }

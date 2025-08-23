@@ -66,9 +66,4 @@ public class Piece {
         numOfMoves += reverse ? -1 : 1;
         square.addPiece(this);
     }
-
-    // Useful for pawn and king pieces
-    public EnPassant getLeftEnPassant() { return null; }
-    public EnPassant getRightEnPassant() { return null; }
-    public boolean getCastledStatus() { return false; }
 }

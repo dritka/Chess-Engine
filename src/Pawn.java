@@ -31,7 +31,6 @@ public class Pawn extends Piece {
         leftEnPassant = rightEnPassant = NO;
     }
 
-    @Override
     public EnPassant getLeftEnPassant() {
         return leftEnPassant;
     }
@@ -40,7 +39,6 @@ public class Pawn extends Piece {
         this.leftEnPassant = leftEnPassant;
     }
 
-    @Override
     public EnPassant getRightEnPassant() {
         return rightEnPassant;
     }
