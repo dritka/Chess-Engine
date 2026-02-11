@@ -1,4 +1,7 @@
+package Game;
+
 import Enums.Type;
+
 import java.awt.*;
 import java.util.*;
 import java.nio.file.*;

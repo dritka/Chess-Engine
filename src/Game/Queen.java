@@ -1,4 +1,7 @@
+package Game;
+
 import Enums.*;
+
 import java.util.Map;
 import static Enums.Color.*;
 import static Enums.Type.*;

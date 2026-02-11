@@ -1,3 +1,5 @@
+package Game;
+
 import Enums.Type;
 import java.awt.*;
 import java.util.*;
@@ -57,10 +59,6 @@ public class Board extends JPanel {
         });
 
         setup();
-
-        Piece whiteKing = pieceMap.get(WHITE).get(KING).get(0);
-        System.out.println(whiteKing);
-        System.out.println(getSquare(whiteKing.row, whiteKing.col + 2).piece);
     }
 
     // -- Start (Setup Code)
@@ -90,24 +88,23 @@ public class Board extends JPanel {
         }
     }
 
-    // Absolute shit, TO DO: Refactor
     private void setupBackRank(Enums.Color color) {
          Piece piece = new Rook(color, true);
-         addPiece(piece);
-         piece = new Rook(color, false);
-         addPiece(piece);
-         piece = new Knight(color, true);
-         addPiece(piece);
-         piece = new Knight(color, false);
-         addPiece(piece);
-         piece = new Bishop(color, true);
-         addPiece(piece);
-         piece = new Bishop(color, false);
-         addPiece(piece);
-         piece = new Queen(color);
-         addPiece(piece);
-         piece = new King(color);
-         addPiece(piece);
+        addPiece(piece);
+        piece = new Rook(color, false);
+        addPiece(piece);
+        piece = new Knight(color, true);
+        addPiece(piece);
+        piece = new Knight(color, false);
+        addPiece(piece);
+        piece = new Bishop(color, true);
+        addPiece(piece);
+        piece = new Bishop(color, false);
+        addPiece(piece);
+        piece = new Queen(color);
+        addPiece(piece);
+        piece = new King(color);
+        addPiece(piece);
     }
 
     private void addPiece(Piece piece) {
@@ -407,6 +404,7 @@ public class Board extends JPanel {
     }
 
     public static void update() {
+        pieceToMove = null;
         playerTurn = playerTurn.equals(WHITE) ? BLACK : WHITE;
         refresh();
     }

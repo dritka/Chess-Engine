@@ -1,3 +1,5 @@
+package Game;
+
 import Enums.SoundType;
 
 import javax.sound.sampled.AudioInputStream;

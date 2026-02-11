@@ -1,4 +1,8 @@
+package Game;
+
 import Enums.*;
+import Game.Board;
+import Game.Piece;
 
 import java.util.Map;
 

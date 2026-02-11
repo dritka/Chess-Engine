@@ -1,3 +1,5 @@
+package Game;
+
 import Enums.Type;
 
 import java.awt.*;
